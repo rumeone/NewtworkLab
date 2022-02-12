@@ -11,9 +11,10 @@
 
 int main() {
 
-    int sockMain, addLenght, msgLenght;
+    int sockMain, msgLenght;
+    socklen_t addLenght;
     struct sockaddr_in servAddr, clientAddr;
-    char buf[BUF_SIZE];
+    char *buf = malloc(sizeof(char) * BUF_SIZE);
 
     //Создаем socket для udp.
 
@@ -28,14 +29,14 @@ int main() {
     servAddr.sin_port = 0;
 
     //функция bind () назначает сокету определенный адрес в семействе адресов. 
-    if (bind (sockMain, &servAddr, sizeof(servAddr))) {
+    if (bind(sockMain, (struct sockaddr *)&servAddr, sizeof(servAddr)) < 0){
         perror("Ошибка bind");
         exit(1);
     }
 
     //извлекаем номер портра и копируем порт в servAddr
     addLenght = sizeof(servAddr);
-    if (getsockname(sockMain, &servAddr, &addLenght)) {
+    if (getsockname(sockMain, (struct sockaddr *)&servAddr, &addLenght) < 0) {
         perror("Вызов getsocketname неудачен ");
         exit(1);
     }
@@ -45,7 +46,7 @@ int main() {
     while(1) {
         addLenght = sizeof(clientAddr);
         bzero(buf, BUF_SIZE);
-        if ((msgLenght = recvfrom(sockMain, buf, BUF_SIZE, 0, &clientAddr, &addLenght)) < 0) {
+        if ((msgLenght = recvfrom(sockMain, buf, BUF_SIZE, 0, (struct sockaddr*)&clientAddr, &addLenght)) < 0) {
             perror("Ошибка socket клиента");
             exit(1);
         }
@@ -55,7 +56,7 @@ int main() {
     
         printf("SERVER: Сообщение клиента:  \"%s\"\n", buf);
 
-        buf = strcat(buf, "World");
+        buf = strcat(buf, "!!!");
 
         if(sendto(sockMain, buf, sizeof(buf), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr)) < 0 ) {
             perror("Ошибка отправки");
