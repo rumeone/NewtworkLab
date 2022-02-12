@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     int bytes_read;
 
     if (argc < 4) {
-        printf("ENTER ./bin/client hostname port message\n");
+        printf("ENTER ./client hostname port message\n");
         exit(1);
     }
 
@@ -47,18 +47,16 @@ int main(int argc, char *argv[]) {
         exit(2);
     }
 
-    printf("CLIENT: Is ready for sending\n");
+    printf("CLIENT: Готов к отправке\n");
 
     memset(buf, 0, sizeof(char) * BUF_SIZE);
     strcpy(buf, argv[3]);
-    printf("CLIENT: Message to send: \"%s\"\n", buf);
+    printf("CLIENT: Сообщение отправлено: \"%s\"\n", buf);
     if (sendto(sock, buf, strlen(buf), 0, (struct sockaddr *)&server_addr,
                sizeof(server_addr)) < 0) {
         perror("sendto");
         exit(3);
     }
-
-    printf("CLIENT: Sending complete\n");
 
     if ((bytes_read = recvfrom(sock, buf, BUF_SIZE, 0,
                                (struct sockaddr *)&server_addr, &length)) < 0) {
@@ -66,7 +64,7 @@ int main(int argc, char *argv[]) {
         exit(4);
     }
 
-    printf("CLIENT: Received back message: \"%s\"\n", buf);
+    printf("CLIENT: Сообщение получено: \"%s\"\n", buf);
 
     close(sock);
 
